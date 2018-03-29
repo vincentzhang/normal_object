@@ -157,15 +157,19 @@ void bbox_callback(const std_msgs::String::ConstPtr& msg)
 {
     vector<string> boxes = string_convertor::split(msg->data, ',');
     box_size = atoi(boxes[0].c_str());
+    u_path.clear();
+    v_path.clear();
+    obj_vec.clear();
+    height_vec.clear();
+    width_vec.clear();
+    cout << "Before inserting, the vectors are: " << endl;
+    for (int i=0; i< u_path.size(); i++) {
+       cout << u_path[i] << ", " << v_path[i] << ", " << obj_vec[i] << ", " << height_vec[i] << ", " << width_vec[i] << endl;
+    }
     if (box_size > 0) {
         // if more than one bounding box, set the flag
         new_box = true;
         //cout << "boxes size: " << box_size << endl;
-        u_path.clear();
-        v_path.clear();
-        obj_vec.clear();
-        height_vec.clear();
-        width_vec.clear();
     }
     else {
         new_box = false;
@@ -183,9 +187,13 @@ void bbox_callback(const std_msgs::String::ConstPtr& msg)
         u_path.push_back(round(x));
         v_path.push_back(round(y));
         obj_vec.push_back(cls);
-        height_vec.push_back(h);
-        width_vec.push_back(w);
+        height_vec.push_back(round(h));
+        width_vec.push_back(round(w));
         cout << cls << " x,y,h,w: " <<x << ", " << y << ", " << h << ", " << w << endl;
+    }
+    cout << "After inserting, the vectors are: " << endl;
+    for (int i=0; i< u_path.size(); i++) {
+       cout << u_path[i] << ", " << v_path[i] << ", " << obj_vec[i] << ", " << height_vec[i] << ", " << width_vec[i] << endl;
     }
 }
 
@@ -241,11 +249,14 @@ void callback(const PointCloud::ConstPtr& msg) {
     ne.compute(*normals);
 */
     if(new_box) {
+        xyz_path_coordinate.resize(0); // clearing the vector
         xyz_path_coordinate.resize(box_size);
  //       xyz_path_normal.resize(box_size);
  //       xyz_path_normal_point.resize(box_size);
 
 	       //resize robot vectors
+        path_robot_v.resize(0);
+        path_robot_r.resize(0);
         path_robot_v.resize(box_size);
         path_robot_r.resize(box_size);
   //      normals_robot_v.resize(box_size);
